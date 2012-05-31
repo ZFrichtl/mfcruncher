@@ -5,10 +5,8 @@ import fileinput
 
 class FundInfo:
     def __init__(self, fundFilename):
-        print fundFilename
         (head, tail) = os.path.split(fundFilename)
         fundName = tail.split('.')[0]
-        print fundName
         fundName = fundName.split('_')[1]
         fundName = fundName.upper()
         self.fundName = fundName
