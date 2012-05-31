@@ -5,7 +5,10 @@ import fileinput
 
 class FundInfo:
     def __init__(self, fundFilename):
-        fundName = fundFilename.split('\\')[-1].split('.')[0]
+        print fundFilename
+        (head, tail) = os.path.split(fundFilename)
+        fundName = tail.split('.')[0]
+        print fundName
         fundName = fundName.split('_')[1]
         fundName = fundName.upper()
         self.fundName = fundName
@@ -80,10 +83,11 @@ class FundInfo:
                 return item[1] 
         return None
 
-inputFilePath = '..\\testfiles\\'
+inputFilePath = os.path.join('..','testfiles')
 
 if len(sys.argv) == 2:
     inputFilePath = sys.argv[1]
+
 
 allFunds = []
 
@@ -264,7 +268,7 @@ for i in range(1, len(dates)):
 
 print outstr
 
-outfile = open(inputFilePath + 'results.csv','w')
+outfile = open(os.path.join(inputFilePath, 'results.csv'),'w')
 outfile.write(outstr)
 outfile.close()
 
