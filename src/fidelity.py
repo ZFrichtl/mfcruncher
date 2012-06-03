@@ -1,4 +1,6 @@
 import urllib
+import re
+import sys
 
 baseUrl = 'http://fundresearch.fidelity.com/mutual-funds/'
 
@@ -6,31 +8,27 @@ url = urllib.urlopen(baseUrl + 'fund-families-no-transaction-fee')
 
 page = url.read()
 
-find = 0
-oldfind = 0
+symbols  = []
 
-while (find is not  -1) and oldfind <= find:
-    oldfind = find
-    find = page.find('funds-by-family', find)
+familyLinks = re.findall(r'"funds-by-family\?family=\w+"',page)
+familyLinks = [x[1:len(x)-1] for x in familyLinks]
 
-    familyUrl = page[find:page[find:].find('"')+find]
-
-    familyObj = urllib.urlopen(baseUrl + familyUrl)
-    familyPage = familyObj.read()
-    print familyUrl
+for family in familyLinks:
+    sys.stderr.write('\nFamily: %s\n' % family)
+    url = urllib.urlopen(baseUrl + family)
+    page = url.read()
+	
+    fundLinks = re.findall(r'"summary/\w+"', page)
+    fundLinks = [x[1:len(x)-1] for x in fundLinks]
     
+    for fund in fundLinks:
+        url = urllib.urlopen(baseUrl + fund)
+        page = url.read()
 
-    familyfind = 0
-    oldfamilyfind = 0
+        symbol = re.search(r'SECURITY_ID=\w+&', page).group()
+        symbol = symbol[12:len(symbol)-1]
+        sys.stderr.write('Fund: %s\n' % symbol)
+        
+        symbols.append(symbol) 
 
-    while (familyfind is not  -1) and oldfamilyfind <= familyfind:
-        oldfamilyfind = familyfind
-        familyfind = familyPage.find('"summary', familyfind)
-        familyfind = familyfind+1
-
-        fundUrl = familyPage[familyfind:familyPage[familyfind:].find('"')+familyfind]
-
-        print fundUrl
-
-        familyfind = familyfind+1
-    find = find+1
+print symbols
