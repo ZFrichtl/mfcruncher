@@ -7,6 +7,7 @@ baseUrl = 'http://fundresearch.fidelity.com/mutual-funds/'
 url = urllib.urlopen(baseUrl + 'fund-families-no-transaction-fee')
 
 page = url.read()
+url.close()
 
 symbols  = []
 fundpicks = []
@@ -18,6 +19,7 @@ for family in familyLinks:
     sys.stderr.write('\nFamily: %s\n' % family)
     url = urllib.urlopen(baseUrl + family)
     page = url.read()
+    url.close()
 	
     fundLinks = re.findall(r'"summary/\w+"', page)
     fundLinks = [x[1:len(x)-1] for x in fundLinks]
@@ -25,6 +27,7 @@ for family in familyLinks:
     for fund in fundLinks:
         url = urllib.urlopen(baseUrl + fund)
         page = url.read()
+        url.close()
 
         symbol = re.search(r'SECURITY_ID=\w+&', page)
         if symbol is None:
