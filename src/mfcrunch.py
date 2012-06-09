@@ -12,39 +12,83 @@ class FundInfo:
         self.fundName = fundName
         self.history = None
 
-        self.daily = []
-        isFirst = True
-        limit = 0
+        ## Sample the file to determine if it is monthly
+        ## daily prices
+        samples = []
+        count = 0
         for line in fileinput.input(fundFilename):
-            limit += 1
-            #if limit == 200:
-            #    break
-            if isFirst: # skip first line, column headers
-                isFirst = False
-                continue 
-            parts = line.split(',')
-            self.daily.append( (parts[0], float(parts[-1]) ) )
-
+            samples.append(line)
+            count += 1
+            if count == 4:
+                break
         fileinput.close()
-        self.daily.reverse()  # order from oldest to newest
-        # print self.daily
+        samples = samples[1:]
+        monthSamples = []
+        for s in samples:
+            date = s.split(',')[0]
+            monthSamples.append(int(date.split('-')[1]))
+        isDaily = False
+        for m in monthSamples:
+            if monthSamples.count(m) > 1:
+                isDaily = True
+                break
 
-        self.monthly = []
-        isFirst = True
-        for entry in self.daily:
-            parts = entry[0].split('-')
-            year = parts[0]
-            month = parts[1]
-            if isFirst:
-                prevMonth = month
-                isFirst = False
-                continue
-            if month != prevMonth:
-                if prevMonth == '12':
-                    year = '%d'%(int(year)-1)
-                self.monthly.append( ('%s-%s'%(year,prevMonth), entry[1]) )
-                prevMonth = month
+        if isDaily:
+            self.daily = []
+            isFirst = True
+            limit = 0
+            for line in fileinput.input(fundFilename):
+                limit += 1
+                #if limit == 200:
+                #    break
+                if isFirst: # skip first line, column headers
+                    isFirst = False
+                    continue 
+                parts = line.split(',')
+                self.daily.append( (parts[0], float(parts[-1]) ) )
+            fileinput.close()
+            self.daily.reverse()  # order from oldest to newest
 
+            self.monthly = []
+            isFirst = True
+            for entry in self.daily:
+                parts = entry[0].split('-')
+                year = parts[0]
+                month = parts[1]
+                price = entry[1]
+                if isFirst:
+                    prevMonth = month
+                    prevPrice = price
+                    isFirst = False
+                    continue
+                if month != prevMonth:
+                    if prevMonth == '12':
+                        year = '%d'%(int(year)-1)
+                    self.monthly.append( ('%s-%s'%(year,prevMonth), prevPrice) )
+                    prevMonth = month
+                prevPrice = price
+                    
+        else: # read monthly csv file
+            self.monthly = []
+            isFirst = True
+            limit = 0
+            for line in fileinput.input(fundFilename):
+                limit += 1
+                #if limit == 200:
+                #    break
+                if isFirst: # skip first line, column headers
+                    isFirst = False
+                    continue 
+                parts = line.split(',')
+                date = parts[0].split('-')
+                year = date[0]
+                month = date[1]
+                newDate = '%s-%s'%(year,month)
+                self.monthly.append( (newDate, float(parts[-1]) ) )
+            fileinput.close()
+            self.monthly = self.monthly[1:]
+            self.monthly.reverse()  # order from oldest to newest
+            
         #if self.fundName == 'ISCAX':
         #    print self.monthly
 
@@ -112,7 +156,7 @@ initialAmount = 10000.00
 startDate = '2000-01'
 endDate     = '2002-06'
 maxPastMonths = 3
-maxInvestedFunds = 2
+maxInvestedFunds = 1
 fundsToDisplay = 10
 
 # omitFund = []
