@@ -1,17 +1,15 @@
-from sqlalchemy import Column, Integer, String, create_engine, DATE, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy import ForeignKey
+import sqlalchemy
+import sqlalchemy.ext.declarative
 
-engine = create_engine('sqlite:///test.sqlite', echo=True)
+engine = sqlalchemy.create_engine('sqlite:///test.sqlite', echo=True)
 
-Base = declarative_base()
+Base = sqlalchemy.ext.declarative.declarative_base()
 
 class Fund(Base):
     __tablename__ = 'funds'
-    id = Column(Integer, primary_key=True)
-    symbol = Column(String)
-    name = Column(String)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    symbol = sqlalchemy.Column(sqlalchemy.String)
+    name = sqlalchemy.Column(sqlalchemy.String)
 
     def __init__(self, symbol):
         self.symbol = symbol
@@ -21,13 +19,13 @@ class Fund(Base):
 
 class HistoricalPrice(Base):
     __tablename__ = 'historicalprices'
-    id = Column(Integer, primary_key=True)
-    date = Column(DATE) 
-    price = Column(Float)
-    fund_id = Column(Integer, ForeignKey('funds.id'))
-    fund = relationship('Fund', backref=backref('historicalprices', order_by=id))
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    date = sqlalchemy.Column(sqlalchemy.DATE) 
+    price = sqlalchemy.Column(sqlalchemy.Float)
+    fund_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('funds.id'))
+    fund = sqlalchemy.orm.relationship('Fund', backref=sqlalchemy.orm.backref('historicalprices', order_by=id))
 
-    def __init__(self, date, price)
+    def __init__(self, date, price):
         self.date = date
         self.price = price
 
