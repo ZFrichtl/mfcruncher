@@ -46,6 +46,10 @@ class HistoricalPrice(__Base):
     price = sqlalchemy.Column(sqlalchemy.Float)
     fund_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('Funds.id'))
     fund = sqlalchemy.orm.relationship('Fund', backref=sqlalchemy.orm.backref('HistoricalPrices', order_by=id))
+    def __init__(self, date, price):
+        self.date = date
+        self.price = price
+
 
 class Availability(__Base):
     __tablename__ = 'Availability'
