@@ -25,7 +25,7 @@ class FundInfo:
                 isFirst = False
                 continue 
             parts = line.split(',')
-            self.monthly.append( (parts[0], float(parts[-1]) ) )
+            self.monthly.append( (parts[0], float(parts[-1]), float(parts[1]) ) )
 
         fileinput.close()
 
@@ -44,7 +44,7 @@ for fund in allFunds:
     print 'Fund: %s, '%(fund.fundName),
     print 'Price: %s,'%(fund.monthly[0][1]),
     endPrice = float(fund.monthly[0][1])
-    startPrice = float(fund.monthly[pastMonths][1])
+    startPrice = float(fund.monthly[pastMonths][2])
     delta = (endPrice - startPrice) / startPrice
     print '%d Month Change: %0.2f%%'%(pastMonths, 100*delta)
     performance.append( (delta, fund.fundName) )
